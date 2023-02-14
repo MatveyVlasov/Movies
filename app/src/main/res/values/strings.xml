@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Movies</string>
+
+    <string name="error_occurred">Error occurred</string>
+    <string name="network_error">Check your network connection</string>
+    <string name="forbidden_error">Forbidden</string>
+    <string name="test_error_server">Test error</string>
+    <string name="test_error">Test error</string>
+
+    <string name="movie_poster">Movie poster</string>
+    <string name="try_again">Try again</string>
+
+    <string name="home">Home</string>
+    <string name="search">Search</string>
+    <string name="profile">Profile</string>
 </resources>

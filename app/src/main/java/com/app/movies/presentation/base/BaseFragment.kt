@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
+import com.app.movies.presentation.activity.MainActivity
 
 abstract class BaseFragment<T: ViewBinding>: Fragment() {
 
@@ -30,5 +31,9 @@ abstract class BaseFragment<T: ViewBinding>: Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    protected fun setLoadingState(isLoading: Boolean) {
+        (activity as? MainActivity)?.setLoadingState(isLoading)
     }
 }

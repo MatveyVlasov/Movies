@@ -1,16 +1,16 @@
-package com.app.movies.presentation.screen.home
+package com.app.movies.presentation.screen.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.movies.domain.model.onError
 import com.app.movies.domain.model.onSuccess
-import com.app.movies.domain.usecase.GetPopularMoviesUseCase
+import com.app.movies.domain.usecase.SearchMoviesUseCase
 import com.app.movies.presentation.model.ErrorItem
 import com.app.movies.presentation.model.LoadingItem
 import com.app.movies.presentation.model.UIState
 import com.app.movies.presentation.screen.home.mapper.toMovieItem
-import com.app.movies.presentation.screen.home.model.HomeScreenEvent
-import com.app.movies.presentation.screen.home.model.HomeScreenUIState
+import com.app.movies.presentation.screen.search.model.SearchScreenEvent
+import com.app.movies.presentation.screen.search.model.SearchScreenUIState
 import com.app.movies.util.delegateadapter.DelegateAdapterItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -23,25 +23,30 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-    private val getPopularMoviesUseCase: GetPopularMoviesUseCase
+class SearchViewModel @Inject constructor(
+    private val searchMoviesUseCase: SearchMoviesUseCase
 ) : ViewModel() {
 
-    val uiState: StateFlow<UIState<HomeScreenUIState>>
+    val uiState: StateFlow<UIState<SearchScreenUIState>>
         get() = _uiState
 
-    val event: SharedFlow<HomeScreenEvent>
+    val event: SharedFlow<SearchScreenEvent>
         get() = _event
 
-    private val _uiState = MutableStateFlow<UIState<HomeScreenUIState>>(UIState.Loading)
-    private val _event = MutableSharedFlow<HomeScreenEvent>()
+    private val _uiState = MutableStateFlow<UIState<SearchScreenUIState>>(UIState.Loading)
+    private val _event = MutableSharedFlow<SearchScreenEvent>()
 
-    private var screenUIState = HomeScreenUIState()
+    private var screenUIState = SearchScreenUIState()
 
     private var job: Job? = null
 
     init {
         updateList()
+    }
+
+    fun onSearchQueryChanged(searchQuery: String) {
+        if (searchQuery == screenUIState.searchQuery) return
+        updateScreenState(screenUIState.copy(searchQuery = searchQuery))
     }
 
     fun updateList() {
@@ -50,8 +55,8 @@ class HomeViewModel @Inject constructor(
         postItem(LoadingItem)
 
         job = viewModelScope.launch {
-            getPopularMoviesUseCase(page = screenUIState.page).onSuccess {
-                updateScreenState(screenUIState.copy(page = screenUIState.page + 1))
+            searchMoviesUseCase(query = screenUIState.searchQuery).onSuccess {
+                screenUIState = screenUIState.copy(movies = emptyList())
                 postListItems(it.map { movie -> movie.toMovieItem() })
             }.onError {
                 postItem(ErrorItem(it.message))
@@ -72,12 +77,12 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private fun updateScreenState(state: HomeScreenUIState) {
+    private fun updateScreenState(state: SearchScreenUIState) {
         screenUIState = state
         _uiState.value = UIState.Success(screenUIState)
     }
 
-    private fun emitEvent(event: HomeScreenEvent) {
+    private fun emitEvent(event: SearchScreenEvent) {
         viewModelScope.launch {
             _event.emit(event)
         }

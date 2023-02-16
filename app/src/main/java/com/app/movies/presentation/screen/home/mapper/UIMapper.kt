@@ -1,7 +1,7 @@
 package com.app.movies.presentation.screen.home.mapper
 
 import com.app.movies.domain.model.MovieModel
-import com.app.movies.presentation.screen.home.model.MovieDelegateItem
+import com.app.movies.presentation.model.MovieDelegateItem
 
 fun MovieModel.toMovieItem() =
     MovieDelegateItem(

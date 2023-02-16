@@ -1,6 +1,8 @@
 package com.app.movies.util
 
 import android.content.Context
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import com.app.movies.R
@@ -30,3 +32,13 @@ fun loadImage(
 
 fun loadMovieImage(context: Context, imageView: ImageView, url: String) =
     loadImage(context = context, imageView = imageView, url = url, defaultImage = R.drawable.ic_movie)
+
+fun EditText.onDone(callback: () -> Unit) {
+    setOnEditorActionListener { _, actionId, _ ->
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            callback.invoke()
+            return@setOnEditorActionListener true
+        }
+        false
+    }
+}

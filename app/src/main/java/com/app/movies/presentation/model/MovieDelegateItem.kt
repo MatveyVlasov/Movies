@@ -1,4 +1,4 @@
-package com.app.movies.presentation.screen.home.model
+package com.app.movies.presentation.model
 
 import com.app.movies.util.delegateadapter.DelegateAdapterItem
 

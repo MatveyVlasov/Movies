@@ -7,4 +7,5 @@ interface MovieRepository {
 
     suspend fun getPopularMovies(page: Int): ApiResult<MoviesDto>
 
+    suspend fun searchMovies(query: String): ApiResult<MoviesDto>
 }

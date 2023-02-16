@@ -1,40 +1,42 @@
-package com.app.movies.presentation.screen.home
+package com.app.movies.presentation.screen.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.app.movies.databinding.FragmentHomeBinding
+import com.app.movies.databinding.FragmentSearchBinding
 import com.app.movies.presentation.base.BaseFragment
 import com.app.movies.util.delegateadapter.CompositeAdapter
 import com.app.movies.presentation.adapter.ErrorDelegateAdapter
 import com.app.movies.presentation.adapter.LoadingDelegateAdapter
 import com.app.movies.presentation.model.onSuccess
 import com.app.movies.presentation.adapter.MovieDelegateAdapter
-import com.app.movies.presentation.screen.home.model.HomeScreenEvent
+import com.app.movies.presentation.screen.search.model.SearchScreenEvent
+import com.app.movies.presentation.screen.search.model.SearchScreenUIState
+import com.app.movies.util.onDone
 import com.app.movies.util.setupBottomNavigation
 import com.app.movies.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class HomeFragment: BaseFragment<FragmentHomeBinding>() {
+class SearchFragment: BaseFragment<FragmentSearchBinding>() {
 
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: SearchViewModel by viewModels()
 
     private val moviesAdapter by lazy {
         CompositeAdapter.Builder()
-            .setOnUpdateCallback(viewModel::updateList)
             .add(ErrorDelegateAdapter(viewModel::updateList))
             .add(LoadingDelegateAdapter())
             .add(MovieDelegateAdapter(onClick = {}))
             .build()
     }
 
-    override fun createBinding(inflater: LayoutInflater) = FragmentHomeBinding.inflate(inflater)
+    override fun createBinding(inflater: LayoutInflater) = FragmentSearchBinding.inflate(inflater)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,6 +57,10 @@ class HomeFragment: BaseFragment<FragmentHomeBinding>() {
     private fun initListeners() {
         binding.apply {
 
+            etSearch.onDone { viewModel.updateList() }
+            btnSearch.setOnClickListener { viewModel.updateList() }
+
+            etSearch.addTextChangedListener { viewModel.onSearchQueryChanged(it.toString()) }
         }
     }
 
@@ -65,6 +71,7 @@ class HomeFragment: BaseFragment<FragmentHomeBinding>() {
                     viewModel.uiState.collect {
                         it.onSuccess { data ->
                             moviesAdapter.submitList(data.movies)
+                            renderUIState(data)
                         }
                     }
                 }
@@ -76,12 +83,20 @@ class HomeFragment: BaseFragment<FragmentHomeBinding>() {
         }
     }
 
-    private fun handleEvent(event: HomeScreenEvent) {
+    private fun handleEvent(event: SearchScreenEvent) {
         when (event) {
-            is HomeScreenEvent.ShowSnackbar -> showSnackbar(message = event.message)
-            is HomeScreenEvent.ShowSnackbarByRes -> showSnackbar(message = event.message)
-            is HomeScreenEvent.Loading -> Unit
+            is SearchScreenEvent.ShowSnackbar -> showSnackbar(message = event.message)
+            is SearchScreenEvent.ShowSnackbarByRes -> showSnackbar(message = event.message)
+            is SearchScreenEvent.Loading -> Unit
         }
-        setLoadingState(event is HomeScreenEvent.Loading)
+        setLoadingState(event is SearchScreenEvent.Loading)
+    }
+
+    private fun renderUIState(data: SearchScreenUIState) {
+        binding.apply {
+            if (!etSearch.isFocused) etSearch.setText(data.searchQuery)
+        }
+
+        setLoadingState(false)
     }
 }

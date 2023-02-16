@@ -6,9 +6,15 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface MovieService {
-    @GET("movie/popular/")
+    @GET("movie/popular")
     suspend fun getPopularMovies(
         @Query("page")
         page: Int
+    ): Response<MoviesDto>
+
+    @GET("search/movie")
+    suspend fun searchMovies(
+        @Query("query")
+        query: String
     ): Response<MoviesDto>
 }

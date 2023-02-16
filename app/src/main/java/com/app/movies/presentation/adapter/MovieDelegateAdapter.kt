@@ -1,10 +1,10 @@
-package com.app.movies.presentation.screen.home.adapter
+package com.app.movies.presentation.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.app.movies.databinding.ItemMovieBinding
-import com.app.movies.presentation.screen.home.model.MovieDelegateItem
+import com.app.movies.presentation.model.MovieDelegateItem
 import com.app.movies.util.delegateadapter.DelegateAdapter
 import com.app.movies.util.loadMovieImage
 

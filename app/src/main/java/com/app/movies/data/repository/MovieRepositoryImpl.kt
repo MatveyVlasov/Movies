@@ -19,4 +19,9 @@ class MovieRepositoryImpl @Inject constructor(
         wrap {
             movieService.getPopularMovies(page = page)
         }
+
+    override suspend fun searchMovies(query: String): ApiResult<MoviesDto> =
+        wrap {
+            movieService.searchMovies(query = query)
+        }
 }
